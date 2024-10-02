@@ -1,0 +1,29 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#map {
+    height: 50vh;
+    margin-bottom: 20px;
+}
+
+#chartContainer {
+    height: 40vh;
+}
+
+#analysisResults {
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
