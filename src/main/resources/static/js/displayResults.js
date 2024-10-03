@@ -13,6 +13,7 @@ function displayAnalysisResults(results) {
         <p>Start Coordinates: ${results.startLat.toFixed(6)}, ${results.startLon.toFixed(6)}</p>
         <p>End Coordinates: ${results.endLat.toFixed(6)}, ${results.endLon.toFixed(6)}</p>
         <p>RAILWAY.APP WORKS???</p>
+        <p>Another test</p>
     `;
 }
 
