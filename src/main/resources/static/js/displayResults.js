@@ -12,6 +12,7 @@ function displayAnalysisResults(results) {
         <p>Total Distance: ${results.totalDistanceKm.toFixed(2)} km</p>
         <p>Start Coordinates: ${results.startLat.toFixed(6)}, ${results.startLon.toFixed(6)}</p>
         <p>End Coordinates: ${results.endLat.toFixed(6)}, ${results.endLon.toFixed(6)}</p>
+        <p>RAILWAY.APP WORKS???</p>
     `;
 }
 
