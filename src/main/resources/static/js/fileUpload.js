@@ -7,6 +7,16 @@ function uploadFile() {
         return;
     }
 
+    // make sure only gpx... maybe xml/csv some day
+
+    const fileName = file.name;
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+
+    if (fileExtension !== "gpx") {
+        alert("Please select a GPX file");
+        return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
