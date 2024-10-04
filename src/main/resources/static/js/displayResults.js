@@ -2,7 +2,7 @@ let map, routePolyline, currentPositionMarker, chart;
 let allPoints, distances;
 let startMarker, endMarker;
 const MAX_DISTANCE_THRESHOLD = 0.5;
-const OSRM_API = "https://router.project-osrm.org/route/v1/driving";
+
 
 
 
