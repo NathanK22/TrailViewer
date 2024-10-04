@@ -33,12 +33,12 @@ function initializeMap(results) {
     
 
     // for routing
-    /*
+    
     let startPoint = allPoints[0];
     let endPoint = allPoints[allPoints.length - 1]
     
 
-    
+    /*
     startMarker = L.marker([startPoint.lat, startPoint.lon], {draggable: true}).addTo(map)
         .bindPopup('Start');
     endMarker = L.marker([endPoint.lat, endPoint.lon], {draggable: true}).addTo(map)
