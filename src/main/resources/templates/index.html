@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trail Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <h1>Welcome to Trail Planner</h1>
-    <p>Upload your GPX file to analyze your trail:</p>
+    <div class="container index-container">
+    <h1>Welcome to Trail Viewer</h1>
+    <p>Upload your GPX file to analyze your trail</p>
+    <label for="gpxFile" class="file-upload-label">Choose File</label>
     <input type="file" id="gpxFile" accept=".gpx">
+    <div id="filename-display"></div>
     <button onclick="uploadFile()">Upload and Analyze</button>
 
+    </div>
     <script src="/js/fileUpload.js"></script>
 </body>
 </html>

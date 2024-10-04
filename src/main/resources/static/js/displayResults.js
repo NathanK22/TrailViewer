@@ -4,20 +4,11 @@ let startMarker, endMarker;
 const MAX_DISTANCE_THRESHOLD = 0.5;
 const OSRM_API = "https://router.project-osrm.org/route/v1/driving";
 
-function displayAnalysisResults(results) {
-    const resultsDiv = document.getElementById('analysisResults');
-    resultsDiv.innerHTML = `
-        <p>Start Location: ${results.startLocation}</p>
-        <p>End Location: ${results.endLocation}</p>
-        <p>Total Distance: ${results.totalDistanceKm.toFixed(2)} km</p>
-        <p>Start Coordinates: ${results.startLat.toFixed(6)}, ${results.startLon.toFixed(6)}</p>
-        <p>End Coordinates: ${results.endLat.toFixed(6)}, ${results.endLon.toFixed(6)}</p>
-        <p>RAILWAY.APP WORKS???</p>
-        <p>Another test</p>
-    `;
-}
+
+
 
 // possibly remove some of the junk in analysisResults
+
 
 function initializeMap(results) {
     allPoints = results.allPoints;
@@ -33,25 +24,30 @@ function initializeMap(results) {
 
     map.fitBounds(routePolyline.getBounds());
 
-    /*
-    STATIC markers
+    
+    //STATIC markers
     L.marker([results.startLat, results.startLon]).addTo(map)
         .bindPopup('Start: ' + results.startLocation);
     L.marker([results.endLat, results.endLon]).addTo(map)
         .bindPopup('End: ' + results.endLocation);
-    */
+    
 
+    // for routing
+    /*
     let startPoint = allPoints[0];
     let endPoint = allPoints[allPoints.length - 1]
+    
+
     
     startMarker = L.marker([startPoint.lat, startPoint.lon], {draggable: true}).addTo(map)
         .bindPopup('Start');
     endMarker = L.marker([endPoint.lat, endPoint.lon], {draggable: true}).addTo(map)
         .bindPopup('End');
-
+    
     startMarker.on("dragend", (event) => onMarkerDragEnd(event, "start"));
     endMarker.on("dragend", (event) => onMarkerDragEnd(event, "end"));
-    
+    */
+
     // marker for current position
     currentPositionMarker = L.circleMarker([startPoint.lat, startPoint.lon], {
         color: 'blue',
@@ -63,8 +59,10 @@ function initializeMap(results) {
     // Add mousemove event listener to the map
     map.on('mousemove', onMapMouseMove);
 
-
 }
+
+
+
 
 
 function createAltitudeGraph(allPoints) {
@@ -84,7 +82,7 @@ function createAltitudeGraph(allPoints) {
             distances.push(totalDistance);
 
             let elevationChange = point.ele - prevPoint.ele;
-            let segmentDistanceMeters = segmentDistance * 1000; //need metres
+            let segmentDistanceMeters = segmentDistance * 1000; //metres
             let slope = (elevationChange / segmentDistanceMeters) * 100; // in percentage
             slopes.push(slope);
         } else {
@@ -257,6 +255,17 @@ function calculateDistance(point1, point2) {
         Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
+}
+
+function displayAnalysisResults(results) {
+    const resultsDiv = document.getElementById('analysisResults');
+    resultsDiv.innerHTML = `
+        <p>Start Location: ${results.startLocation}</p>
+        <p>End Location: ${results.endLocation}</p>
+        <p>Total Distance: ${results.totalDistanceKm.toFixed(2)} km</p>
+        <p>Start Coordinates: ${results.startLat.toFixed(6)}, ${results.startLon.toFixed(6)}</p>
+        <p>End Coordinates: ${results.endLat.toFixed(6)}, ${results.endLon.toFixed(6)}</p>
+    `;
 }
 
 document.addEventListener('DOMContentLoaded', function() {

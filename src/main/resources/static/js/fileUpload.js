@@ -1,4 +1,21 @@
+document.getElementById("gpxFile").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    const filenameDisplay = document.getElementById("filename-display");
+
+    if (file) {
+        filenameDisplay.textContent = `Selected file: ${file.name}`;
+    } else {
+        filenameDisplay.textContent = "";
+    }
+})
+
+// works for now to stop error message if someone spams it
+// maybe add something to actually disable button and enable given some circumstance
+let isUploading = false;
+
 function uploadFile() {
+    if (isUploading) return;
+
     const fileInput = document.getElementById('gpxFile');
     const file = fileInput.files[0];
     
@@ -17,6 +34,8 @@ function uploadFile() {
         return;
     }
 
+    isUploading = true;
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -34,5 +53,10 @@ function uploadFile() {
     .catch(error => {
         console.error('Error:', error);
         alert('An error occurred while analyzing the GPX file.');
+    })
+    .finally(() => {
+        setTimeout(() => {
+            isUploading = false;
+        }, 2000);
     });
 }
