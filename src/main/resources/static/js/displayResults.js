@@ -1,8 +1,8 @@
 let map, routePolyline, currentPositionMarker, chart;
-let allPoints, distances;
+let allPoints, filteredPoints, distances;
 let startMarker, endMarker;
-const MAX_DISTANCE_THRESHOLD = 0.5;
-
+const MAX_DISTANCE_THRESHOLD = 0.5; // for mouse
+const MIN_DISTANCE_THRESHOLD = 0.1; // to filter close points
 
 
 
@@ -12,6 +12,7 @@ const MAX_DISTANCE_THRESHOLD = 0.5;
 
 function initializeMap(results) {
     allPoints = results.allPoints;
+    filteredPoints = filterClosePoints(allPoints);
 
     map = L.map('map').setView([allPoints[0].lat, allPoints[0].lon, 13], 13);
 
@@ -61,24 +62,29 @@ function initializeMap(results) {
     // Add mousemove event listener to the map
     map.on('mousemove', onMapMouseMove);
 
+    // Don't delete allPoints 
+
 }
 
 
 
-
+// For the graph to take out kinks the trackpoints cannot be too close
+// I will filter the close ones out for the purposes of the graph
+// This may be used in some place other than the graph maybe create a more global variable if so
 
 function createAltitudeGraph(allPoints) {
+
     distances = [0];
     let elevations = [];
     let slopes = [];
     let totalDistance = 0;
 
-    for (let i = 0; i < allPoints.length; i++) {
-        let point = allPoints[i];
+    for (let i = 0; i < filteredPoints.length; i++) {
+        let point = filteredPoints[i];
         elevations.push(point.ele);
 
         if (i > 0) {
-            let prevPoint = allPoints[i-1];
+            let prevPoint = filteredPoints[i-1];
             let segmentDistance = calculateDistance(prevPoint, point);
             totalDistance += segmentDistance;
             distances.push(totalDistance);
@@ -191,32 +197,53 @@ function createAltitudeGraph(allPoints) {
     });
 }
 
+// just apply same logic as before
+function filterClosePoints(points) {
+    // haha
+    if (points.length < 2) return points;
+
+    let filteredPoints = [points[0]];
+    let lastPoint = points[0];
+
+    for (let i = 1; i < points.length; i++) {
+        let currentPoint = points[i];
+        let distance = calculateDistance(lastPoint, currentPoint);
+
+        if (distance >= MIN_DISTANCE_THRESHOLD) {
+            filteredPoints.push(currentPoint);
+            lastPoint = currentPoint;
+        }
+    }
+
+    if (lastPoint !== points[points.length - 1]) {
+        filteredPoints.push(points[points.length - 1]);
+    } 
+
+    return filteredPoints;
+// maybe at some point decouple the slope and ele as ele does not create kinks in graph
+}
+
 
 // PURELY FOR LIVE MOVEMENT OF MARKER BI-DIRECTIONALITY
 
-function updateMapPosition(point, updateChart = true) {
+function updateMapPosition(point, updateChart = true) { // and chart pos
     if (map && currentPositionMarker) {
         currentPositionMarker.setLatLng([point.lat, point.lon]);
     }
     
-    if (updateChart) {
-        updateChartPosition(point);
+    if (updateChart && chart && point.index !== undefined) {
+        chart.setActiveElements([
+            {datasetIndex: 0, index: point.index},
+            {datasetIndex: 1, index: point.index}
+        ]);
+        chart.tooltip.setActiveElements([
+            {datasetIndex: 0, index: point.index},
+            {datasetIndex: 1, index: point.index}
+        ]);
+        chart.update();
     }
 }
 
-function updateChartPosition(point) {
-    if (chart) {
-        const index = allPoints.findIndex(p => p.lat === point.lat && p.lon === point.lon);
-        if (index !== -1) {
-            chart.setActiveElements([{datasetIndex: 0, index: index}, 
-                {datasetIndex: 1, index: index}]);
-            chart.tooltip.setActiveElements([{datasetIndex: 0, index: index}, 
-                {datasetIndex: 1, index: index}]);
-                 
-            chart.update();
-        }
-    }
-}
 
 function onMapMouseMove(e) {
     if (routePolyline) {
@@ -236,13 +263,14 @@ function findClosestPointOnRoute(latlng) {
     let minDistance = Infinity;
     let closestPoint = null;
 
-    for (let point of allPoints) {
+    filteredPoints.forEach((point, index) => { 
         const distance = map.distance(latlng, [point.lat, point.lon]);
         if (distance < minDistance) {
             minDistance = distance;
             closestPoint = point;
+            closestPoint.index = index;  
         }
-    }
+    });
 
     return closestPoint;
 }
