@@ -12,7 +12,10 @@ const MIN_DISTANCE_THRESHOLD = 0.1; // to filter close points
 
 function initializeMap(results) {
     allPoints = results.allPoints;
-    filteredPoints = filterClosePoints(allPoints);
+
+    // FilteredPoints to be used on graph with OG index attached included
+    
+    filteredPoints = filterClosePoints(allPoints)
 
     map = L.map('map').setView([allPoints[0].lat, allPoints[0].lon, 13], 13);
 
@@ -73,6 +76,7 @@ function initializeMap(results) {
 // This may be used in some place other than the graph maybe create a more global variable if so
 
 function createAltitudeGraph(allPoints) {
+
 
     distances = [0];
     let elevations = [];
@@ -190,7 +194,8 @@ function createAltitudeGraph(allPoints) {
             onHover: (event, elements) => { // event
                 if (elements.length > 0) {
                     const index = elements[0].index;
-                    updateMapPosition(allPoints[index], false);
+                    const originalIndex = filteredPoints[index].originalIndex;
+                    updateMapPosition(allPoints[originalIndex], false);
                 }
             }
         }
@@ -198,11 +203,14 @@ function createAltitudeGraph(allPoints) {
 }
 
 // just apply same logic as before
+// WORKING HERE
 function filterClosePoints(points) {
-    // haha
     if (points.length < 2) return points;
 
-    let filteredPoints = [points[0]];
+    let filteredPoints = [{
+        ...points[0], 
+        originalIndex: 0
+    }];
     let lastPoint = points[0];
 
     for (let i = 1; i < points.length; i++) {
@@ -210,14 +218,20 @@ function filterClosePoints(points) {
         let distance = calculateDistance(lastPoint, currentPoint);
 
         if (distance >= MIN_DISTANCE_THRESHOLD) {
-            filteredPoints.push(currentPoint);
+            filteredPoints.push({
+                ...currentPoint, 
+                originalIndex: i
+            });
             lastPoint = currentPoint;
         }
     }
 
     if (lastPoint !== points[points.length - 1]) {
-        filteredPoints.push(points[points.length - 1]);
-    } 
+        filteredPoints.push({ 
+            ...points[points.length - 1], 
+            originalIndex: points.length - 1 
+        });
+    }
 
     return filteredPoints;
 // maybe at some point decouple the slope and ele as ele does not create kinks in graph
@@ -262,15 +276,20 @@ function onMapMouseMove(e) {
 function findClosestPointOnRoute(latlng) {
     let minDistance = Infinity;
     let closestPoint = null;
+    let closestFilteredIndex = null;
 
     filteredPoints.forEach((point, index) => { 
         const distance = map.distance(latlng, [point.lat, point.lon]);
         if (distance < minDistance) {
             minDistance = distance;
-            closestPoint = point;
-            closestPoint.index = index;  
+            closestPoint = allPoints[point.originalIndex];
+            closestFilteredIndex = index;  
         }
     });
+
+    if (closestPoint) {
+        closestPoint.index = closestFilteredIndex;
+    }
 
     return closestPoint;
 }
