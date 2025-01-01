@@ -306,6 +306,7 @@ function calculateDistance(point1, point2) {
     return R * c;
 }
 
+// Just here to test some server to client talk
 function displayAnalysisResults(results) {
     const resultsDiv = document.getElementById('analysisResults');
     resultsDiv.innerHTML = `

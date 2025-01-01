@@ -60,3 +60,35 @@ function uploadFile() {
         }, 2000);
     });
 }
+
+function loadDemo() {
+    fetch('../exampleGpx/demo.gpx')
+        .then(response => response.blob()) // this results in blob to be chained
+        .then(blob => {
+            // Create a File object from raw
+            const demoFile = new File([blob], "demo.gpx", {
+                type: "application/gpx"
+            });
+            
+            // Create FormData and append file
+            const formData = new FormData();
+            formData.append('file', demoFile);
+
+            // Use same upload endpoint as normal file uploads
+            return fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Store the analysis results in sessionStorage
+            sessionStorage.setItem('analysisResults', JSON.stringify(data));
+            // Redirect to the map page
+            window.location.href = '/map';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while loading the demo track.');
+        });
+}
